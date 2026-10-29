@@ -1,44 +1,54 @@
 // src/styles/theme.js
 // One place for every color, size and shadow used in the app.
-// Other files import this and use it inside their style objects.
+// Palette: warm paper + deep teal. Change a value here and the whole app follows.
 
 export const colors = {
   // brand
-  primary: "#4F46E5",
-  primaryHover: "#4338CA",
-  primarySoft: "#EEF2FF",
+  primary: "#0F766E",
+  primaryHover: "#115E59",
+  primarySoft: "#E3F3F0",
 
-  // neutrals
-  background: "#F8FAFC",
+  // surfaces and lines (warm neutrals)
+  background: "#F6F4EF",
   surface: "#FFFFFF",
-  border: "#E2E8F0",
-  borderStrong: "#CBD5E1",
+  surfaceMuted: "#FAF8F4",
+  border: "#E8E3DA",
+  borderStrong: "#D6CFC2",
 
   // text
-  textPrimary: "#0F172A",
-  textSecondary: "#475569",
-  textMuted: "#94A3B8",
+  textPrimary: "#1C1917",
+  textSecondary: "#57534E",
+  textMuted: "#78716C",
   textOnPrimary: "#FFFFFF",
 
   // status
-  success: "#16A34A",
-  successSoft: "#DCFCE7",
-  warning: "#D97706",
-  warningSoft: "#FEF3C7",
-  danger: "#DC2626",
-  dangerSoft: "#FEE2E2",
-  info: "#0284C7",
-  infoSoft: "#E0F2FE",
+  success: "#15803D",
+  successSoft: "#E1F3E6",
+  warning: "#B45309",
+  warningSoft: "#FDF0DC",
+  danger: "#B91C1C",
+  dangerSoft: "#FBE4E1",
+  info: "#1D4ED8",
+  infoSoft: "#E4EEFB",
+
+  // sidebar (dark)
+  sidebarBg: "#0F1F1D",
+  sidebarBorder: "#1D3532",
+  sidebarText: "#A9BDB9",
+  sidebarTextActive: "#FFFFFF",
+  sidebarActiveBg: "#1B3D39",
+  sidebarHoverBg: "#162B29",
+  sidebarAccent: "#5EEAD4",
 };
 
 // Pipeline stages for the kanban board (used by deals)
 export const stageColors = {
-  lead: { bg: "#F1F5F9", text: "#475569", dot: "#94A3B8" },
-  contacted: { bg: "#E0F2FE", text: "#0369A1", dot: "#0284C7" },
-  proposal: { bg: "#EEF2FF", text: "#4338CA", dot: "#4F46E5" },
-  negotiation: { bg: "#FEF3C7", text: "#B45309", dot: "#D97706" },
-  won: { bg: "#DCFCE7", text: "#15803D", dot: "#16A34A" },
-  lost: { bg: "#FEE2E2", text: "#B91C1C", dot: "#DC2626" },
+  lead: { bg: "#EFECE6", text: "#57534E", dot: "#A8A29E" },
+  contacted: { bg: "#E4EEFB", text: "#1D4ED8", dot: "#3B82F6" },
+  proposal: { bg: "#EDE7FB", text: "#6D28D9", dot: "#8B5CF6" },
+  negotiation: { bg: "#FDF0DC", text: "#B45309", dot: "#F59E0B" },
+  won: { bg: "#E1F3E6", text: "#15803D", dot: "#22A55A" },
+  lost: { bg: "#FBE4E1", text: "#B91C1C", dot: "#EF4444" },
 };
 
 export const spacing = {
@@ -52,9 +62,9 @@ export const spacing = {
 };
 
 export const radius = {
-  sm: 6,
-  md: 8,
-  lg: 12,
+  sm: 8,
+  md: 10,
+  lg: 14,
   pill: 999,
 };
 
@@ -76,19 +86,19 @@ export const fontWeights = {
 };
 
 export const shadows = {
-  sm: "0 1px 2px rgba(15, 23, 42, 0.06)",
-  md: "0 4px 12px rgba(15, 23, 42, 0.08)",
-  lg: "0 12px 32px rgba(15, 23, 42, 0.14)",
+  sm: "0 1px 2px rgba(28, 25, 23, 0.05)",
+  md: "0 6px 16px rgba(28, 25, 23, 0.08)",
+  lg: "0 18px 40px rgba(28, 25, 23, 0.16)",
 };
 
 export const layout = {
-  sidebarWidth: 240,
-  topbarHeight: 60,
+  sidebarWidth: 248,
+  topbarHeight: 64,
   contentMaxWidth: 1280,
 };
 
 export const fontFamily =
-  "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif";
+  "'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif";
 
 // Handy shared style objects so we don't repeat ourselves
 export const card = {
@@ -103,4 +113,6 @@ export const pageTitle = {
   fontWeight: fontWeights.bold,
   color: colors.textPrimary,
   margin: 0,
-};
+  letterSpacing: "-0.02em",
+  lineHeight: 1.2,
+}; 
