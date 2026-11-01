@@ -61,8 +61,32 @@ textarea:focus {
 .btn-ghost:hover:not(:disabled) { background-color: #f3f0ea !important; }
 
 .row-hover:hover { background-color: #faf8f4 !important; }
-.nav-link:hover { background-color: #162b29 !important; }
+.nav-link:hover {
+  background-color: #162b29 !important;
+  color: #ffffff !important;
+}
+.sidebar-icon-btn:hover {
+  background-color: #1b3d39 !important;
+  color: #ffffff !important;
+}
 .card-hover:hover {
   box-shadow: 0 6px 16px rgba(28, 25, 23, 0.08) !important;
   border-color: #d6cfc2 !important;
+}
+
+/* Slim, warm scrollbars (kanban board, column lists, dropdown lists) */
+.thin-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #cfc7b9 transparent;
+}
+
+/* Dropdown trigger (the closed Select). It is a div, so it needs its own hover and focus. */
+.dropdown-trigger:hover:not([aria-disabled="true"]) {
+  border-color: #a8a29e !important;
+}
+.dropdown-trigger:focus-visible,
+.dropdown-trigger[aria-expanded="true"] {
+  outline: none;
+  border-color: #0f766e !important;
+  box-shadow: 0 0 0 3px #d3ebe7;
 }

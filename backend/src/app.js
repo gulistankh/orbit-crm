@@ -15,6 +15,8 @@ import companiesRoutes from "./routes/companies.routes.js";
 import contactsRoutes from "./routes/contacts.routes.js";
 import dealsRoutes from "./routes/deals.routes.js";
 import activitiesRoutes from "./routes/activities.routes.js";
+import notificationsRoutes from "./routes/notifications.routes.js";
+
 
 const app = express();
 
@@ -48,6 +50,7 @@ app.use("/api/users", usersRoutes);
 app.use("/api/companies", companiesRoutes);
 app.use("/api/contacts", contactsRoutes);
 app.use("/api/deals", dealsRoutes);
+app.use("/api/notifications", notificationsRoutes);
 app.use("/api", activitiesRoutes);
 // More routes will be mounted here
 

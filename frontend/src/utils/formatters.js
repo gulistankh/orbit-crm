@@ -1,6 +1,16 @@
 // src/utils/formatters.js
 // Small helpers to display data nicely.
 
+// "2026-11-15" (a date with no time) is read as that day in the viewer's own timezone,
+// so it can never jump to the day before. Anything else is read normally.
+export function parseDate(value) {
+  if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    const [year, month, day] = value.split("-").map(Number);
+    return new Date(year, month - 1, day);
+  }
+  return new Date(value);
+}
+
 export function formatCurrency(value) {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -11,7 +21,7 @@ export function formatCurrency(value) {
 
 export function formatDate(dateString) {
   if (!dateString) return "-";
-  return new Date(dateString).toLocaleDateString("en-US", {
+  return parseDate(dateString).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -20,7 +30,7 @@ export function formatDate(dateString) {
 
 export function formatDateTime(dateString) {
   if (!dateString) return "-";
-  return new Date(dateString).toLocaleString("en-US", {
+  return parseDate(dateString).toLocaleString("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -31,7 +41,7 @@ export function formatDateTime(dateString) {
 
 export function timeAgo(dateString) {
   if (!dateString) return "";
-  const seconds = Math.floor((Date.now() - new Date(dateString).getTime()) / 1000);
+  const seconds = Math.floor((Date.now() - parseDate(dateString).getTime()) / 1000);
   if (seconds < 60) return "just now";
   const minutes = Math.floor(seconds / 60);
   if (minutes < 60) return `${minutes} min ago`;

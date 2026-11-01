@@ -17,6 +17,7 @@ import { useDeals } from "../hooks/useDeals";
 import { usePermissions } from "../hooks/usePermissions";
 import { contactStatuses, dealStages } from "../data/mock";
 import { formatCurrency, formatDate } from "../utils/formatters";
+import TimeStamp from "../components/ui/TimeStamp";
 import { card, colors, spacing, fontSizes, fontWeights } from "../styles/theme";
 
 // Only allow normal web links, never things like javascript:
@@ -325,7 +326,9 @@ export default function CompanyDetail() {
             </DetailRow>
             <DetailRow label="Location">{location}</DetailRow>
             <DetailRow label="Owner">{company.ownerName}</DetailRow>
-            <DetailRow label="Created">{formatDate(company.createdAt)}</DetailRow>
+            <DetailRow label="Created">
+              <TimeStamp value={company.createdAt} />
+            </DetailRow>
           </section>
         </div>
       </div>

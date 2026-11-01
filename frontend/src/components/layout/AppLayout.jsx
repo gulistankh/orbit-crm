@@ -69,7 +69,7 @@ export default function AppLayout() {
     overlay: {
       position: "fixed",
       inset: 0,
-      backgroundColor: "rgba(15, 23, 42, 0.4)",
+      backgroundColor: "rgba(28, 25, 23, 0.45)",
       zIndex: 800,
     },
   };

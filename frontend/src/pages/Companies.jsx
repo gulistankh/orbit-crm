@@ -1,19 +1,17 @@
-// src/pages/Companies.jsx
+ // src/pages/Companies.jsx
 
 import { useMemo, useState } from "react";
 import CompanyTable from "../components/companies/CompanyTable";
 import CompanyForm from "../components/companies/CompanyForm";
-import SearchBar from "../components/ui/SearchBar";
-import FilterBar from "../components/ui/FilterBar";
 import Modal from "../components/ui/Modal";
 import ConfirmDialog from "../components/ui/ConfirmDialog";
 import Button from "../components/ui/Button";
 import { useCompanies } from "../hooks/useCompanies";
-import { useAuth } from "../context/AuthContext";
 import { usePermissions } from "../hooks/usePermissions";
-import { industries } from "../data/mock";
 import { exportCompaniesCsv } from "../utils/csv";
 import { colors, pageTitle, spacing, fontSizes } from "../styles/theme";
+import FilterChips from "../components/ui/FilterChips";
+import { usePageFilters } from "../hooks/usePageFilters";
 
 const styles = {
   header: {
@@ -39,15 +37,12 @@ const styles = {
   },
 };
 
-const emptyFilters = { industry: "", ownerId: "" };
 
 export default function Companies() {
   const { companies, addCompany, updateCompany, deleteCompany } = useCompanies();
-  const { users } = useAuth();
   const { can } = usePermissions();
-
-  const [search, setSearch] = useState("");
-  const [filters, setFilters] = useState(emptyFilters);
+  const { search, values: filters, definitions, count, setFilter, clearFilters } =
+  usePageFilters();
   const [formState, setFormState] = useState({ open: false, company: null });
   const [companyToDelete, setCompanyToDelete] = useState(null);
 
@@ -65,19 +60,6 @@ export default function Companies() {
         .includes(term);
     });
   }, [companies, search, filters]);
-
-  const filterConfig = [
-    {
-      key: "industry",
-      label: "Industry",
-      options: industries.map((name) => ({ value: name, label: name })),
-    },
-    {
-      key: "ownerId",
-      label: "Owner",
-      options: users.map((u) => ({ value: u.id, label: u.name })),
-    },
-  ];
 
   function closeForm() {
     setFormState({ open: false, company: null });
@@ -126,17 +108,16 @@ export default function Companies() {
       </div>
 
       <div style={styles.toolbar}>
-        <SearchBar
-          value={search}
-          onChange={setSearch}
-          placeholder="Search name, industry, city..."
-        />
-        <FilterBar
-          filters={filterConfig}
-          values={filters}
-          onChange={(key, value) => setFilters((prev) => ({ ...prev, [key]: value }))}
-          onClear={() => setFilters(emptyFilters)}
-        />
+       {count > 0 && (
+          <div style={styles.toolbar}>
+            <FilterChips
+              filters={definitions}
+              values={filters}
+              onChange={setFilter}
+              onClear={clearFilters}
+            />
+          </div>
+        )}
       </div>
 
       <CompanyTable

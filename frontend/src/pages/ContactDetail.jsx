@@ -17,10 +17,12 @@ import { useDeals } from "../hooks/useDeals";
 import { useActivities } from "../hooks/useActivities";
 import { usePermissions } from "../hooks/usePermissions";
 import { contactStatuses, dealStages } from "../data/mock";
-import { formatCurrency, formatDate } from "../utils/formatters";
+import { formatCurrency } from "../utils/formatters";
+import TimeStamp from "../components/ui/TimeStamp";
 import {
   card,
   colors,
+  radius,
   spacing,
   fontSizes,
   fontWeights,
@@ -55,6 +57,19 @@ const styles = {
   role: { margin: "4px 0 8px", fontSize: fontSizes.md, color: colors.textSecondary },
   link: { color: colors.primary, textDecoration: "none", fontWeight: fontWeights.medium },
   actions: { display: "flex", gap: spacing.sm },
+    quickLink: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 8,
+    padding: "9px 14px",
+    fontSize: fontSizes.md,
+    fontWeight: fontWeights.medium,
+    color: colors.textPrimary,
+    backgroundColor: colors.surface,
+    border: `1px solid ${colors.border}`,
+    borderRadius: radius.md,
+    textDecoration: "none",
+  },
   columns: { display: "flex", flexWrap: "wrap", gap: spacing.lg, alignItems: "flex-start" },
   main: {
     flex: "2 1 420px",
@@ -124,6 +139,26 @@ function DetailRow({ label, children }) {
       <span style={styles.detailLabel}>{label}</span>
       <span style={styles.detailValue}>{children || <span style={styles.muted}>-</span>}</span>
     </div>
+  );
+}
+
+function QuickLink({ href, label, children }) {
+  return (
+    <a href={href} className="btn-secondary" style={styles.quickLink}>
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        {children}
+      </svg>
+      {label}
+    </a>
   );
 }
 
@@ -220,6 +255,17 @@ export default function ContactDetail() {
         </div>
 
         <div style={styles.actions}>
+          {contact.email && (
+            <QuickLink href={`mailto:${contact.email}`} label="Email">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+              <polyline points="22,6 12,13 2,6" />
+            </QuickLink>
+          )}
+          {contact.phone && (
+            <QuickLink href={`tel:${contact.phone.replace(/[^\d+]/g, "")}`} label="Call">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+            </QuickLink>
+          )}
           {canEdit && (
             <Button variant="secondary" onClick={() => setEditOpen(true)}>
               Edit
@@ -270,7 +316,9 @@ export default function ContactDetail() {
             <DetailRow label="Company">{contact.companyName}</DetailRow>
             <DetailRow label="Source">{contact.source}</DetailRow>
             <DetailRow label="Owner">{contact.ownerName}</DetailRow>
-            <DetailRow label="Created">{formatDate(contact.createdAt)}</DetailRow>
+            <DetailRow label="Created">
+              <TimeStamp value={contact.createdAt} />
+            </DetailRow>
           </section>
 
           <section style={styles.section}>

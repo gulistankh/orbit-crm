@@ -9,7 +9,9 @@ import { useActivities } from "../hooks/useActivities";
 import { useContacts } from "../hooks/useContacts";
 import { useCompanies } from "../hooks/useCompanies";
 import { dealStages, activityTypes } from "../data/mock";
-import { formatCurrency, formatDate, timeAgo } from "../utils/formatters";
+import { formatCurrency } from "../utils/formatters";
+import TimeStamp from "../components/ui/TimeStamp";
+import { useAuth } from "../context/AuthContext";
 import {
   card,
   pageTitle,
@@ -47,13 +49,29 @@ const styles = {
     fontWeight: fontWeights.medium,
     color: colors.textSecondary,
   },
+  
+    statTop: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  statIcon: {
+    width: 38,
+    height: 38,
+    borderRadius: radius.md,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   statValue: {
-    margin: "8px 0 4px",
+    margin: "14px 0 4px",
     fontSize: fontSizes.title,
     fontWeight: fontWeights.bold,
     color: colors.textPrimary,
     lineHeight: 1.1,
+    letterSpacing: "-0.02em",
   },
+
   statSub: { fontSize: fontSizes.sm, color: colors.textMuted },
   twoColumn: {
     display: "grid",
@@ -102,7 +120,7 @@ const styles = {
   barTrack: {
     height: 8,
     borderRadius: radius.pill,
-    backgroundColor: "#F1F5F9",
+    backgroundColor: "#EFECE6",
     overflow: "hidden",
   },
   // activity list
@@ -166,16 +184,63 @@ const styles = {
   },
 };
 
-function StatCard({ label, value, sub }) {
+function greeting() {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good morning";
+  if (hour < 18) return "Good afternoon";
+  return "Good evening";
+}
+
+const statIcons = {
+  pipeline: (
+    <>
+      <line x1="12" y1="1" x2="12" y2="23" />
+      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+    </>
+  ),
+  won: <polyline points="20 6 9 17 4 12" />,
+  rate: (
+    <>
+      <line x1="19" y1="5" x2="5" y2="19" />
+      <circle cx="6.5" cy="6.5" r="2.5" />
+      <circle cx="17.5" cy="17.5" r="2.5" />
+    </>
+  ),
+  contacts: (
+    <>
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </>
+  ),
+};
+
+function StatCard({ label, value, sub, icon, bg, color }) {
   return (
     <div style={styles.statCard}>
-      <div style={styles.statLabel}>{label}</div>
+      <div style={styles.statTop}>
+        <span style={styles.statLabel}>{label}</span>
+        <span style={{ ...styles.statIcon, backgroundColor: bg, color }}>
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            {statIcons[icon]}
+          </svg>
+        </span>
+      </div>
       <div style={styles.statValue}>{value}</div>
       <div style={styles.statSub}>{sub}</div>
     </div>
   );
 }
-
 function Section({ title, linkTo, linkLabel, children }) {
   return (
     <section style={styles.section}>
@@ -197,6 +262,8 @@ export default function Dashboard() {
   const { getRecentActivities } = useActivities();
   const { contacts } = useContacts();
   const { companies } = useCompanies();
+  const { currentUser } = useAuth();
+  const firstName = currentUser ? currentUser.name.split(" ")[0] : "";
 
   const recentActivities = getRecentActivities(6);
 
@@ -225,28 +292,46 @@ export default function Dashboard() {
   return (
     <div>
       <div style={styles.header}>
-        <h1 style={pageTitle}>Dashboard</h1>
-        <p style={styles.subtitle}>Overview of your pipeline and recent team activity.</p>
+        <h1 style={pageTitle}>
+          {greeting()}, {firstName}
+        </h1>
+        <p style={styles.subtitle}>Here's what's happening in your pipeline today.</p>
       </div>
 
       <div style={styles.statGrid}>
-        <StatCard
-          label="Open pipeline"
-          value={formatCurrency(stats.openValue)}
-          sub={`${stats.openCount} open deals`}
-        />
-        <StatCard
-          label="Won revenue"
-          value={formatCurrency(stats.wonValue)}
-          sub={`${stats.wonCount} deals won`}
-        />
-        <StatCard label="Win rate" value={`${stats.winRate}%`} sub="Of closed deals" />
-        <StatCard
-          label="Contacts"
-          value={contacts.length}
-          sub={`${companies.length} companies`}
-        />
-      </div>
+  <StatCard
+    label="Open pipeline"
+    value={formatCurrency(stats.openValue)}
+    sub={`${stats.openCount} open deals`}
+    icon="pipeline"
+    bg={colors.primarySoft}
+    color={colors.primary}
+  />
+  <StatCard
+    label="Won revenue"
+    value={formatCurrency(stats.wonValue)}
+    sub={`${stats.wonCount} deals won`}
+    icon="won"
+    bg={colors.successSoft}
+    color={colors.success}
+  />
+  <StatCard
+    label="Win rate"
+    value={`${stats.winRate}%`}
+    sub="Of closed deals"
+    icon="rate"
+    bg={colors.warningSoft}
+    color={colors.warning}
+  />
+  <StatCard
+    label="Contacts"
+    value={contacts.length}
+    sub={`${companies.length} companies`}
+    icon="contacts"
+    bg={colors.infoSoft}
+    color={colors.info}
+  />
+</div>
 
       <div style={styles.twoColumn}>
         <Section title="Pipeline by stage" linkTo="/deals" linkLabel="View pipeline">
@@ -306,7 +391,7 @@ export default function Dashboard() {
                     </div>
                     <p style={styles.activityText}>{activity.content}</p>
                   </div>
-                  <span style={styles.activityTime}>{timeAgo(activity.createdAt)}</span>
+                  <TimeStamp value={activity.createdAt} mode="relative" />
                 </div>
               ))}
             </div>
@@ -332,7 +417,9 @@ export default function Dashboard() {
                 </div>
                 <div style={styles.dealRight}>
                   <div style={styles.dealValue}>{formatCurrency(deal.value)}</div>
-                  <div style={styles.dealMeta}>{formatDate(deal.expectedCloseDate)}</div>
+                  <div style={styles.dealMeta}>
+                    <TimeStamp value={deal.expectedCloseDate} />
+                  </div>
                 </div>
                 <Badge stage={deal.stage}>
                   {dealStages.find((s) => s.key === deal.stage)?.label}

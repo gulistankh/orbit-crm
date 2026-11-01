@@ -9,7 +9,7 @@ import Badge from "../ui/Badge";
 import Button from "../ui/Button";
 import { usePermissions } from "../../hooks/usePermissions";
 import { contactStatuses } from "../../data/mock";
-import { formatDate } from "../../utils/formatters";
+import TimeStamp from "../ui/TimeStamp";
 import { colors, spacing, fontSizes, fontWeights } from "../../styles/theme";
 
 const styles = {
@@ -70,7 +70,7 @@ export default function ContactTable({ contacts, onEdit, onDelete, emptyAction }
       key: "createdAt",
       header: "Created",
       sortable: true,
-      render: (contact) => formatDate(contact.createdAt),
+      render: (contact) => <TimeStamp value={contact.createdAt} />,
     },
     {
       key: "actions",

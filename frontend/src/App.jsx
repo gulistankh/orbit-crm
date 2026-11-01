@@ -17,6 +17,7 @@ import Deals from "./pages/Deals";
 import Users from "./pages/Users";
 import NotFound from "./pages/NotFound";
 import { card } from "./styles/theme";
+import Notifications from "./pages/Notifications";
 
 // Blocks a page when the current role doesn't have the permission.
 // (Hiding the sidebar link isn't enough, someone can type the address.)
@@ -51,6 +52,7 @@ export default function App() {
             <Route path="/companies" element={<Companies />} />
             <Route path="/companies/:id" element={<CompanyDetail />} />
             <Route path="/deals" element={<Deals />} />
+            <Route path="/notifications" element={<Notifications />} />
             <Route
               path="/users"
               element={

@@ -6,12 +6,12 @@ import { getInitials } from "../../utils/formatters";
 import { fontWeights } from "../../styles/theme";
 
 const palette = [
-  { bg: "#EEF2FF", text: "#4338CA" },
-  { bg: "#E0F2FE", text: "#0369A1" },
-  { bg: "#DCFCE7", text: "#15803D" },
-  { bg: "#FEF3C7", text: "#B45309" },
-  { bg: "#FCE7F3", text: "#BE185D" },
-  { bg: "#F3E8FF", text: "#7E22CE" },
+  { bg: "#DDF0EC", text: "#0F766E" },
+  { bg: "#E4EEFB", text: "#1D4ED8" },
+  { bg: "#E1F3E6", text: "#15803D" },
+  { bg: "#FDF0DC", text: "#B45309" },
+  { bg: "#FCE7EF", text: "#BE185D" },
+  { bg: "#EDE7FB", text: "#6D28D9" },
 ];
 
 function pickColor(name) {

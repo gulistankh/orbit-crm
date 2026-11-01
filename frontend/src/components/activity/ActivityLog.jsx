@@ -7,8 +7,9 @@ import Button from "../ui/Button";
 import EmptyState from "../ui/EmptyState";
 import { usePermissions } from "../../hooks/usePermissions";
 import { activityTypes } from "../../data/mock";
-import { formatDateTime, timeAgo } from "../../utils/formatters";
+import TimeStamp from "../ui/TimeStamp";
 import { colors, spacing, fontSizes, fontWeights } from "../../styles/theme";
+
 
 const icons = {
   note: (
@@ -39,10 +40,10 @@ const icons = {
 };
 
 const typeColors = {
-  note: { bg: "#F1F5F9", text: colors.textSecondary, tone: "neutral" },
-  call: { bg: colors.infoSoft, text: "#0369A1", tone: "info" },
+  note: { bg: "#EFECE6", text: colors.textSecondary, tone: "neutral" },
+  call: { bg: colors.infoSoft, text: colors.info, tone: "info" },
   email: { bg: colors.primarySoft, text: colors.primary, tone: "primary" },
-  meeting: { bg: colors.warningSoft, text: "#B45309", tone: "warning" },
+  meeting: { bg: colors.warningSoft, text: colors.warning, tone: "warning" },
 };
 
 const styles = {
@@ -126,9 +127,7 @@ export default function ActivityLog({ activities, onDelete }) {
               <div style={styles.top}>
                 <span style={styles.author}>{activity.userName}</span>
                 <Badge tone={color.tone}>{typeLabel(activity.type)}</Badge>
-                <span style={styles.time} title={formatDateTime(activity.createdAt)}>
-                  {timeAgo(activity.createdAt)}
-                </span>
+                <TimeStamp value={activity.createdAt} mode="datetime" />
                 {canDelete && (
                   <Button
                     variant="ghost"

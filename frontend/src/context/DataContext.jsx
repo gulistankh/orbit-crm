@@ -27,6 +27,8 @@ export function DataProvider({ children }) {
   const [loadedUserId, setLoadedUserId] = useState(null);
   const [toast, setToast] = useState(null);
   const toastTimer = useRef(null);
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const dataReady = Boolean(userId) && loadedUserId === userId;
 
@@ -90,6 +92,70 @@ export function DataProvider({ children }) {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
+  
+    // ---------- notifications ----------
+  async function loadNotifications() {
+    try {
+      const data = await api.get("/notifications?limit=50");
+      setNotifications(data.notifications);
+      setUnreadCount(data.unreadCount);
+    } catch {
+      // the next refresh will try again
+    }
+  }
+
+  // Load them when someone signs in, then check for new ones every 30 seconds
+  // and whenever the browser tab becomes visible again.
+  useEffect(() => {
+    if (!userId) {
+      setNotifications([]);
+      setUnreadCount(0);
+      return undefined;
+    }
+
+    loadNotifications();
+    const timer = setInterval(loadNotifications, 30000);
+
+    function handleVisible() {
+      if (document.visibilityState === "visible") loadNotifications();
+    }
+    document.addEventListener("visibilitychange", handleVisible);
+
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener("visibilitychange", handleVisible);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId]);
+
+  // The screen updates first, then the server is told. If that fails, reload the truth.
+  async function markNotificationRead(id) {
+    const target = notifications.find((n) => n.id === id);
+    if (!target || target.readAt) return;
+
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, readAt: new Date().toISOString() } : n))
+    );
+    setUnreadCount((count) => Math.max(0, count - 1));
+
+    try {
+      await api.patch(`/notifications/${id}/read`);
+    } catch {
+      loadNotifications();
+    }
+  }
+
+  async function markAllNotificationsRead() {
+    const now = new Date().toISOString();
+    setNotifications((prev) => prev.map((n) => (n.readAt ? n : { ...n, readAt: now })));
+    setUnreadCount(0);
+
+    try {
+      await api.post("/notifications/read-all");
+    } catch {
+      loadNotifications();
+    }
+  }
 
   // ---------- activities ----------
   // Makes sure ALL of a contact's activity is loaded (the first load only has the newest)
@@ -243,6 +309,11 @@ export function DataProvider({ children }) {
     toast,
     notify,
     dismissToast,
+    notifications,
+    unreadCount,
+    loadNotifications,
+    markNotificationRead,
+    markAllNotificationsRead,
     loadContactActivities,
     addContact,
     updateContact,

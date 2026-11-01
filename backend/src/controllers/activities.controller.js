@@ -3,6 +3,7 @@
 import { query } from "../config/db.js";
 import { HttpError } from "../middleware/errorHandler.js";
 import { camelize, camelizeRows } from "../utils/mappers.js";
+import { createNotification } from "../utils/notify.js";
 
 // Newest activity across all contacts (for the Dashboard feed)
 export async function listRecentActivities(req, res) {
@@ -33,8 +34,27 @@ export async function createActivity(req, res) {
     [req.params.contactId, req.user.id, req.body.type, req.body.content]
   );
   if (rows.length === 0) throw new HttpError(404, "Contact not found.");
+  const activity = rows[0];
 
-  res.status(201).json(camelize(rows[0]));
+  // Tell the contact's owner (unless they logged it themselves)
+  const contact = await query(
+    "SELECT first_name, last_name, owner_id FROM contacts WHERE id = $1",
+    [activity.contact_id]
+  );
+  if (contact.rows.length > 0) {
+    const { first_name, last_name, owner_id } = contact.rows[0];
+    const contactName = `${first_name} ${last_name}`.trim();
+
+    await createNotification({
+      userId: owner_id,
+      actorId: req.user.id,
+      type: "activity_logged",
+      message: `${req.user.name} logged a ${activity.type} on ${contactName}.`,
+      link: `/contacts/${activity.contact_id}`,
+    });
+  }
+
+  res.status(201).json(camelize(activity));
 }
 
 export async function deleteActivity(req, res) {

@@ -4,18 +4,15 @@ import { useMemo, useState } from "react";
 import ContactTable from "../components/contacts/ContactTable";
 import ContactForm from "../components/contacts/ContactForm";
 import CsvImportModal from "../components/csv/CsvImportModal";
-import SearchBar from "../components/ui/SearchBar";
-import FilterBar from "../components/ui/FilterBar";
 import Modal from "../components/ui/Modal";
 import ConfirmDialog from "../components/ui/ConfirmDialog";
 import Button from "../components/ui/Button";
 import { useContacts } from "../hooks/useContacts";
-import { useCompanies } from "../hooks/useCompanies";
-import { useAuth } from "../context/AuthContext";
 import { usePermissions } from "../hooks/usePermissions";
-import { contactStatuses } from "../data/mock";
 import { exportContactsCsv } from "../utils/csv";
 import { colors, pageTitle, spacing, fontSizes } from "../styles/theme";
+import FilterChips from "../components/ui/FilterChips";
+import { usePageFilters } from "../hooks/usePageFilters";
 
 const styles = {
   header: {
@@ -41,16 +38,12 @@ const styles = {
   },
 };
 
-const emptyFilters = { status: "", companyId: "", ownerId: "" };
 
 export default function Contacts() {
   const { contacts, addContact, updateContact, deleteContact } = useContacts();
-  const { companies } = useCompanies();
-  const { users } = useAuth();
   const { can } = usePermissions();
-
-  const [search, setSearch] = useState("");
-  const [filters, setFilters] = useState(emptyFilters);
+  const { search, values: filters, definitions, count, setFilter, clearFilters } =
+  usePageFilters();
   const [formState, setFormState] = useState({ open: false, contact: null });
   const [contactToDelete, setContactToDelete] = useState(null);
   const [importOpen, setImportOpen] = useState(false);
@@ -77,25 +70,6 @@ export default function Contacts() {
     });
   }, [contacts, search, filters]);
 
-  const filterConfig = [
-    {
-      key: "status",
-      label: "Status",
-      options: contactStatuses.map((s) => ({ value: s.key, label: s.label })),
-    },
-    {
-      key: "companyId",
-      label: "Company",
-      options: [...companies]
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .map((c) => ({ value: c.id, label: c.name })),
-    },
-    {
-      key: "ownerId",
-      label: "Owner",
-      options: users.map((u) => ({ value: u.id, label: u.name })),
-    },
-  ];
 
   function openAddForm() {
     setFormState({ open: true, contact: null });
@@ -156,17 +130,16 @@ export default function Contacts() {
       </div>
 
       <div style={styles.toolbar}>
-        <SearchBar
-          value={search}
-          onChange={setSearch}
-          placeholder="Search name, email, company..."
-        />
-        <FilterBar
-          filters={filterConfig}
-          values={filters}
-          onChange={(key, value) => setFilters((prev) => ({ ...prev, [key]: value }))}
-          onClear={() => setFilters(emptyFilters)}
-        />
+        {count > 0 && (
+          <div style={styles.toolbar}>
+            <FilterChips
+              filters={definitions}
+              values={filters}
+              onChange={setFilter}
+              onClear={clearFilters}
+            />
+          </div>
+        )}
       </div>
 
       <ContactTable

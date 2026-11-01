@@ -6,6 +6,7 @@ import { assertCanModify } from "../middleware/requirePermission.js";
 import { buildInsert, buildUpdate } from "../utils/sql.js";
 import { camelize, camelizeRows } from "../utils/mappers.js";
 import { canAssignOwner, resolveOwnerId } from "../utils/permissions.js";
+import { createNotification } from "../utils/notify.js";
 
 const STAGE_LABELS = {
   lead: "Lead",
@@ -36,7 +37,17 @@ export async function createDeal(req, res) {
 
   const insert = buildInsert("deals", values);
   const { rows } = await query(insert.text, insert.params);
-  res.status(201).json(camelize(rows[0]));
+  const deal = rows[0];
+
+  await createNotification({
+    userId: deal.owner_id,
+    actorId: req.user.id,
+    type: "assigned",
+    message: `${req.user.name} assigned you the deal "${deal.title}".`,
+    link: `/deals?q=${encodeURIComponent(deal.title)}`,
+  });
+
+  res.status(201).json(camelize(deal));
 }
 
 // Shared by "edit a deal" and "move a deal to another stage".
@@ -60,6 +71,7 @@ async function saveDeal(req, res, values) {
 
     const updated = await client.query(update.text, update.params);
     const after = updated.rows[0];
+    const link = `/deals?q=${encodeURIComponent(after.title)}`;
 
     // A stage change leaves a line in the contact's activity log
     if (after.stage !== before.stage && after.contact_id) {
@@ -70,6 +82,34 @@ async function saveDeal(req, res, values) {
           req.user.id,
           `Deal "${after.title}" moved from ${STAGE_LABELS[before.stage]} to ${STAGE_LABELS[after.stage]}.`,
         ]
+      );
+    }
+
+    // ...and tells the deal's owner (unless they moved it themselves)
+    if (after.stage !== before.stage) {
+      await createNotification(
+        {
+          userId: after.owner_id,
+          actorId: req.user.id,
+          type: "deal_moved",
+          message: `${req.user.name} moved your deal "${after.title}" from ${STAGE_LABELS[before.stage]} to ${STAGE_LABELS[after.stage]}.`,
+          link,
+        },
+        client
+      );
+    }
+
+    // If the deal was given to someone else, tell the new owner
+    if (after.owner_id !== before.owner_id) {
+      await createNotification(
+        {
+          userId: after.owner_id,
+          actorId: req.user.id,
+          type: "assigned",
+          message: `${req.user.name} assigned you the deal "${after.title}".`,
+          link,
+        },
+        client
       );
     }
 

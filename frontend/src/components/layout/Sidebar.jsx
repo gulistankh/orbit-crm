@@ -1,5 +1,5 @@
 // src/components/layout/Sidebar.jsx
-// Left navigation. On desktop it's always visible.
+// Left navigation (dark). On desktop it's always visible.
 // On small screens it slides in from the left (AppLayout controls open/close).
 
 import { NavLink } from "react-router-dom";
@@ -79,8 +79,8 @@ const styles = {
     left: 0,
     bottom: 0,
     width: layout.sidebarWidth,
-    backgroundColor: colors.surface,
-    borderRight: `1px solid ${colors.border}`,
+    backgroundColor: colors.sidebarBg,
+    borderRight: `1px solid ${colors.sidebarBorder}`,
     display: "flex",
     flexDirection: "column",
     zIndex: 900,
@@ -92,14 +92,14 @@ const styles = {
     alignItems: "center",
     gap: spacing.md,
     padding: `0 ${spacing.xl}px`,
-    borderBottom: `1px solid ${colors.border}`,
+    borderBottom: `1px solid ${colors.sidebarBorder}`,
   },
   brandMark: {
-    width: 30,
-    height: 30,
+    width: 32,
+    height: 32,
     borderRadius: radius.md,
-    backgroundColor: colors.primary,
-    color: colors.textOnPrimary,
+    background: "linear-gradient(135deg, #14B8A6, #0F766E)",
+    color: "#FFFFFF",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -109,14 +109,23 @@ const styles = {
   brandName: {
     fontSize: fontSizes.lg,
     fontWeight: fontWeights.bold,
-    color: colors.textPrimary,
+    color: colors.sidebarTextActive,
+    letterSpacing: "-0.01em",
+  },
+  sectionLabel: {
+    padding: `${spacing.xl}px ${spacing.xl}px ${spacing.sm}px`,
+    fontSize: fontSizes.xs,
+    fontWeight: fontWeights.semibold,
+    textTransform: "uppercase",
+    letterSpacing: "0.08em",
+    color: "#6F8A86",
   },
   nav: {
     flex: 1,
     display: "flex",
     flexDirection: "column",
     gap: 2,
-    padding: spacing.md,
+    padding: `0 ${spacing.md}px ${spacing.md}px`,
     overflowY: "auto",
   },
   link: {
@@ -128,33 +137,46 @@ const styles = {
     textDecoration: "none",
     fontSize: fontSizes.md,
     fontWeight: fontWeights.medium,
-    color: colors.textSecondary,
+    color: colors.sidebarText,
   },
   linkActive: {
-    backgroundColor: colors.primarySoft,
-    color: colors.primary,
+    backgroundColor: colors.sidebarActiveBg,
+    color: colors.sidebarTextActive,
+    boxShadow: `inset 3px 0 0 ${colors.sidebarAccent}`,
   },
-  user: {
+  footer: {
     display: "flex",
     alignItems: "center",
     gap: spacing.md,
     padding: spacing.lg,
-    borderTop: `1px solid ${colors.border}`,
+    borderTop: `1px solid ${colors.sidebarBorder}`,
   },
-  userText: { minWidth: 0 },
+  userText: { flex: 1, minWidth: 0 },
   userName: {
     fontSize: fontSizes.sm,
     fontWeight: fontWeights.semibold,
-    color: colors.textPrimary,
+    color: colors.sidebarTextActive,
     whiteSpace: "nowrap",
     overflow: "hidden",
     textOverflow: "ellipsis",
   },
-  userRole: { fontSize: fontSizes.xs, color: colors.textMuted },
+  userRole: { fontSize: fontSizes.xs, color: colors.sidebarText },
+  logoutButton: {
+    width: 34,
+    height: 34,
+    flexShrink: 0,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    border: "none",
+    borderRadius: radius.sm,
+    backgroundColor: "transparent",
+    color: colors.sidebarText,
+  },
 };
 
 export default function Sidebar({ isMobile, open, onClose }) {
-  const { currentUser } = useAuth();
+  const { currentUser, logout } = useAuth();
   const { can, roleLabel } = usePermissions();
 
   const hidden = isMobile && !open;
@@ -171,6 +193,7 @@ export default function Sidebar({ isMobile, open, onClose }) {
         <span style={styles.brandName}>Orbit CRM</span>
       </div>
 
+      <div style={styles.sectionLabel}>Workspace</div>
       <nav style={styles.nav}>
         {navItems
           .filter((item) => !item.permission || can(item.permission))
@@ -193,12 +216,35 @@ export default function Sidebar({ isMobile, open, onClose }) {
       </nav>
 
       {currentUser && (
-        <div style={styles.user}>
+        <div style={styles.footer}>
           <Avatar name={currentUser.name} size={36} />
           <div style={styles.userText}>
             <div style={styles.userName}>{currentUser.name}</div>
             <div style={styles.userRole}>{roleLabel}</div>
           </div>
+          <button
+            type="button"
+            className="sidebar-icon-btn"
+            style={styles.logoutButton}
+            onClick={logout}
+            aria-label="Log out"
+            title="Log out"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+          </button>
         </div>
       )}
     </aside>

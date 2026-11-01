@@ -5,7 +5,9 @@ import Avatar from "../ui/Avatar";
 import Button from "../ui/Button";
 import { usePermissions } from "../../hooks/usePermissions";
 import { dealStages } from "../../data/mock";
-import { formatCurrency, formatDate } from "../../utils/formatters";
+import { formatCurrency } from "../../utils/formatters";
+import TimeStamp from "../ui/TimeStamp";
+import Select from "../ui/Select";
 import {
   card,
   colors,
@@ -18,12 +20,14 @@ import {
 const styles = {
   card: {
     ...card,
+    borderRadius: radius.lg,
     padding: spacing.md,
     display: "flex",
     flexDirection: "column",
     gap: spacing.sm,
     transition: "box-shadow 0.15s ease, opacity 0.15s ease",
   },
+  
   title: {
     margin: 0,
     fontSize: fontSizes.md,
@@ -52,16 +56,6 @@ const styles = {
     gap: 4,
     borderTop: `1px solid ${colors.border}`,
     paddingTop: spacing.sm,
-  },
-  moveSelect: {
-    flex: 1,
-    minWidth: 0,
-    padding: "5px 8px",
-    fontSize: fontSizes.xs,
-    color: colors.textSecondary,
-    backgroundColor: colors.surface,
-    border: `1px solid ${colors.border}`,
-    borderRadius: radius.sm,
   },
 };
 
@@ -110,31 +104,37 @@ export default function DealCard({
           <Avatar name={deal.ownerName} size={22} />
           {deal.ownerName.split(" ")[0]}
         </span>
-        <span style={{ color: overdue ? colors.danger : colors.textMuted }}>
-          {deal.expectedCloseDate
-            ? `${overdue ? "Overdue · " : ""}${formatDate(deal.expectedCloseDate)}`
-            : "No close date"}
-        </span>
+        {deal.expectedCloseDate ? (
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+            {overdue && (
+              <span style={{ color: colors.danger, fontWeight: fontWeights.medium }}>Overdue</span>
+            )}
+            <TimeStamp
+              value={deal.expectedCloseDate}
+              style={overdue ? { color: colors.danger } : undefined}
+            />
+          </span>
+        ) : (
+          <span>No close date</span>
+        )}
       </div>
 
       {(canEdit || canDelete) && (
         <div style={styles.actions}>
-          {canEdit && (
-            <select
-              aria-label={`Move ${deal.title} to another stage`}
-              style={styles.moveSelect}
-              value=""
-              onChange={(event) => onMove(deal.id, event.target.value)}
-            >
-              <option value="">Move to...</option>
-              {dealStages
-                .filter((stage) => stage.key !== deal.stage)
-                .map((stage) => (
-                  <option key={stage.key} value={stage.key}>
-                    {stage.label}
-                  </option>
-                ))}
-            </select>
+           {canEdit && (
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <Select
+                aria-label={`Move ${deal.title} to another stage`}
+                size="sm"
+                placeholder="Move to..."
+                allowEmpty={false}
+                options={dealStages
+                  .filter((stage) => stage.key !== deal.stage)
+                  .map((stage) => ({ value: stage.key, label: stage.label }))}
+                value=""
+                onChange={(event) => onMove(deal.id, event.target.value)}
+              />
+            </div>
           )}
           {canEdit && (
             <Button variant="ghost" size="sm" onClick={() => onEdit(deal)}>

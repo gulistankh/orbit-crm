@@ -118,11 +118,13 @@ export default function KanbanColumn({
   }
 
   return (
-    <div
+    <div id={`kanban-col-${stage.key}`}
       style={{
         ...styles.column,
-        backgroundColor: isOver ? colors.primarySoft : "#F1F5F9",
+        backgroundColor: isOver ? colors.primarySoft : "#EEEAE1",
         borderColor: isOver ? colors.primary : colors.border,
+        borderTop: `3px solid ${color.dot}`,
+        maxHeight: "100%",
       }}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
@@ -148,24 +150,24 @@ export default function KanbanColumn({
       </div>
       <div style={styles.total}>{formatCurrency(total)}</div>
 
-      <div style={styles.body}>
-        {deals.length === 0 ? (
-          <div style={styles.empty}>{dragActive ? "Drop here" : "No deals"}</div>
-        ) : (
-          deals.map((deal) => (
-            <DealCard
-              key={deal.id}
-              deal={deal}
-              dragging={draggingId === deal.id}
-              onDragStart={onDragStart}
-              onDragEnd={onDragEnd}
-              onMove={onMove}
-              onEdit={onEdit}
-              onDelete={onDelete}
-            />
-          ))
-        )}
-      </div>
+<div className="thin-scroll" style={{ ...styles.body, overflowY: "auto" }}>
+  {deals.length === 0 ? (
+    <div style={styles.empty}>{dragActive ? "Drop here" : "No deals"}</div>
+  ) : (
+    deals.map((deal) => (
+      <DealCard
+        key={deal.id}
+        deal={deal}
+        dragging={draggingId === deal.id}
+        onDragStart={onDragStart}
+        onDragEnd={onDragEnd}
+        onMove={onMove}
+        onEdit={onEdit}
+        onDelete={onDelete}
+      />
+    ))
+  )}
+</div>
     </div>
   );
 }

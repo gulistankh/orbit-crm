@@ -6,6 +6,7 @@ import { assertCanModify } from "../middleware/requirePermission.js";
 import { buildInsert, buildUpdate } from "../utils/sql.js";
 import { camelize, camelizeRows } from "../utils/mappers.js";
 import { canAssignOwner, resolveOwnerId } from "../utils/permissions.js";
+import { createNotification } from "../utils/notify.js";
 
 export async function listCompanies(req, res) {
   const { rows } = await query("SELECT * FROM companies ORDER BY name");
@@ -24,7 +25,18 @@ export async function createCompany(req, res) {
     ownerId: resolveOwnerId(req.user, req.body.ownerId),
   });
   const { rows } = await query(insert.text, insert.params);
-  res.status(201).json(camelize(rows[0]));
+  const company = rows[0];
+
+  // Only does something when an admin or manager gave it to someone else
+  await createNotification({
+    userId: company.owner_id,
+    actorId: req.user.id,
+    type: "assigned",
+    message: `${req.user.name} assigned you the company ${company.name}.`,
+    link: `/companies/${company.id}`,
+  });
+
+  res.status(201).json(camelize(company));
 }
 
 export async function updateCompany(req, res) {
@@ -41,7 +53,20 @@ export async function updateCompany(req, res) {
   if (!update) throw new HttpError(400, "Nothing to update.");
 
   const { rows } = await query(update.text, update.params);
-  res.json(camelize(rows[0]));
+  const company = rows[0];
+
+  // If the owner changed, tell the new owner
+  if (company.owner_id !== existing.rows[0].owner_id) {
+    await createNotification({
+      userId: company.owner_id,
+      actorId: req.user.id,
+      type: "assigned",
+      message: `${req.user.name} assigned you the company ${company.name}.`,
+      link: `/companies/${company.id}`,
+    });
+  }
+
+  res.json(camelize(company));
 }
 
 export async function deleteCompany(req, res) {

@@ -6,14 +6,13 @@
 import { colors, stageColors, radius, fontSizes, fontWeights } from "../../styles/theme";
 
 const tones = {
-  neutral: { bg: "#F1F5F9", text: colors.textSecondary },
+  neutral: { bg: "#EFECE6", text: colors.textSecondary },
   primary: { bg: colors.primarySoft, text: colors.primary },
-  success: { bg: colors.successSoft, text: "#15803D" },
-  warning: { bg: colors.warningSoft, text: "#B45309" },
-  danger: { bg: colors.dangerSoft, text: "#B91C1C" },
-  info: { bg: colors.infoSoft, text: "#0369A1" },
+  success: { bg: colors.successSoft, text: colors.success },
+  warning: { bg: colors.warningSoft, text: colors.warning },
+  danger: { bg: colors.dangerSoft, text: colors.danger },
+  info: { bg: colors.infoSoft, text: colors.info },
 };
-
 const statusTones = {
   lead: "info",
   active: "primary",

@@ -1,23 +1,22 @@
 // src/pages/Deals.jsx
 // Deals pipeline: kanban board or sortable list, with search and filters.
-
 import { useMemo, useState } from "react";
+
 import KanbanBoard from "../components/deals/KanbanBoard";
 import DealForm from "../components/deals/DealForm";
 import DataTable from "../components/ui/DataTable";
-import SearchBar from "../components/ui/SearchBar";
-import FilterBar from "../components/ui/FilterBar";
 import Modal from "../components/ui/Modal";
 import ConfirmDialog from "../components/ui/ConfirmDialog";
 import Badge from "../components/ui/Badge";
 import Button from "../components/ui/Button";
 import { useDeals } from "../hooks/useDeals";
-import { useCompanies } from "../hooks/useCompanies";
-import { useAuth } from "../context/AuthContext";
+import FilterChips from "../components/ui/FilterChips";
+import { usePageFilters } from "../hooks/usePageFilters";
 import { usePermissions } from "../hooks/usePermissions";
 import { dealStages } from "../data/mock";
 import { exportDealsCsv } from "../utils/csv";
-import { formatCurrency, formatDate } from "../utils/formatters";
+import { formatCurrency } from "../utils/formatters";
+import TimeStamp from "../components/ui/TimeStamp";
 import { colors, pageTitle, spacing, fontSizes, fontWeights } from "../styles/theme";
 
 const styles = {
@@ -48,27 +47,22 @@ const styles = {
   actions: { display: "flex", justifyContent: "flex-end", gap: 4 },
 };
 
-const emptyFilters = { companyId: "", ownerId: "", stage: "" };
 
 export default function Deals() {
   const { deals, stats, addDeal, updateDeal, deleteDeal, moveDeal } = useDeals();
-  const { companies } = useCompanies();
-  const { users } = useAuth();
   const { can, canModify } = usePermissions();
-
   const [view, setView] = useState("board");
-  const [search, setSearch] = useState("");
-  const [filters, setFilters] = useState(emptyFilters);
+  const { search, values: filters, definitions, count, setFilter, clearFilters } =
+  usePageFilters();
   const [formState, setFormState] = useState({ open: false, deal: null, stage: "lead" });
   const [dealToDelete, setDealToDelete] = useState(null);
-
   const filteredDeals = useMemo(() => {
     const term = search.trim().toLowerCase();
 
     return deals.filter((deal) => {
       if (filters.companyId && deal.companyId !== filters.companyId) return false;
       if (filters.ownerId && deal.ownerId !== filters.ownerId) return false;
-      if (view === "list" && filters.stage && deal.stage !== filters.stage) return false;
+      if (filters.stage && deal.stage !== filters.stage) return false;
 
       if (!term) return true;
       return [deal.title, deal.companyName, deal.contactName]
@@ -76,7 +70,7 @@ export default function Deals() {
         .toLowerCase()
         .includes(term);
     });
-  }, [deals, search, filters, view]);
+  }, [deals, search, filters]);
 
   const dealsByStage = useMemo(() => {
     const grouped = {};
@@ -85,28 +79,6 @@ export default function Deals() {
     });
     return grouped;
   }, [filteredDeals]);
-
-  const filterConfig = [
-    {
-      key: "companyId",
-      label: "Company",
-      options: [...companies]
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .map((c) => ({ value: c.id, label: c.name })),
-    },
-    {
-      key: "ownerId",
-      label: "Owner",
-      options: users.map((u) => ({ value: u.id, label: u.name })),
-    },
-  ];
-  if (view === "list") {
-    filterConfig.push({
-      key: "stage",
-      label: "Stage",
-      options: dealStages.map((s) => ({ value: s.key, label: s.label })),
-    });
-  }
 
   function stageLabel(key) {
     const found = dealStages.find((s) => s.key === key);
@@ -181,7 +153,7 @@ export default function Deals() {
       key: "expectedCloseDate",
       header: "Expected close",
       sortable: true,
-      render: (deal) => formatDate(deal.expectedCloseDate),
+      render: (deal) => <TimeStamp value={deal.expectedCloseDate} />,
     },
     { key: "ownerName", header: "Owner", sortable: true },
     {
@@ -258,13 +230,16 @@ export default function Deals() {
       </div>
 
       <div style={styles.toolbar}>
-        <SearchBar value={search} onChange={setSearch} placeholder="Search deals..." />
-        <FilterBar
-          filters={filterConfig}
-          values={filters}
-          onChange={(key, value) => setFilters((prev) => ({ ...prev, [key]: value }))}
-          onClear={() => setFilters(emptyFilters)}
-        />
+        {count > 0 && (
+  <div style={styles.toolbar}>
+    <FilterChips
+      filters={definitions}
+      values={filters}
+      onChange={setFilter}
+      onClear={clearFilters}
+    />
+  </div>
+)}
       </div>
 
       {view === "board" ? (

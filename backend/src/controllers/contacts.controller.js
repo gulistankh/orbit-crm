@@ -7,6 +7,7 @@ import { EMAIL_PATTERN } from "../middleware/validate.js";
 import { buildInsert, buildUpdate } from "../utils/sql.js";
 import { camelize, camelizeRows } from "../utils/mappers.js";
 import { canAssignOwner, resolveOwnerId } from "../utils/permissions.js";
+import { createNotification } from "../utils/notify.js";
 
 const STATUSES = ["lead", "active", "customer", "inactive"];
 
@@ -21,13 +22,27 @@ export async function getContact(req, res) {
   res.json(camelize(rows[0]));
 }
 
+function contactName(row) {
+  return `${row.first_name} ${row.last_name}`.trim();
+}
+
 export async function createContact(req, res) {
   const insert = buildInsert("contacts", {
     ...req.body,
     ownerId: resolveOwnerId(req.user, req.body.ownerId),
   });
   const { rows } = await query(insert.text, insert.params);
-  res.status(201).json(camelize(rows[0]));
+  const contact = rows[0];
+
+  await createNotification({
+    userId: contact.owner_id,
+    actorId: req.user.id,
+    type: "assigned",
+    message: `${req.user.name} assigned you the contact ${contactName(contact)}.`,
+    link: `/contacts/${contact.id}`,
+  });
+
+  res.status(201).json(camelize(contact));
 }
 
 export async function updateContact(req, res) {
@@ -44,7 +59,19 @@ export async function updateContact(req, res) {
   if (!update) throw new HttpError(400, "Nothing to update.");
 
   const { rows } = await query(update.text, update.params);
-  res.json(camelize(rows[0]));
+  const contact = rows[0];
+
+  if (contact.owner_id !== existing.rows[0].owner_id) {
+    await createNotification({
+      userId: contact.owner_id,
+      actorId: req.user.id,
+      type: "assigned",
+      message: `${req.user.name} assigned you the contact ${contactName(contact)}.`,
+      link: `/contacts/${contact.id}`,
+    });
+  }
+
+  res.json(camelize(contact));
 }
 
 export async function deleteContact(req, res) {

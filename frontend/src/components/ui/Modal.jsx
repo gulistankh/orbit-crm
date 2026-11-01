@@ -3,15 +3,17 @@
 //   ...form...
 // </Modal>
 // Closes on Escape and when you click the dark background.
+// It is drawn on document.body (a "portal"), so no parent element can clip or shrink it.
 
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 import { colors, radius, shadows, spacing, fontSizes, fontWeights } from "../../styles/theme";
 
 const styles = {
   overlay: {
     position: "fixed",
     inset: 0,
-    backgroundColor: "rgba(15, 23, 42, 0.5)",
+    backgroundColor: "rgba(28, 25, 23, 0.5)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -81,7 +83,7 @@ export default function Modal({ open, onClose, title, children, footer, width = 
 
   if (!open) return null;
 
-  return (
+  return createPortal(
     <div style={styles.overlay} onMouseDown={onClose}>
       <div
         role="dialog"
@@ -105,6 +107,7 @@ export default function Modal({ open, onClose, title, children, footer, width = 
         <div style={styles.body}>{children}</div>
         {footer && <div style={styles.footer}>{footer}</div>}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

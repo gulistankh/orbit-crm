@@ -131,3 +131,21 @@ CREATE TRIGGER contacts_set_updated_at
 CREATE TRIGGER deals_set_updated_at
   BEFORE UPDATE ON deals
   FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+-- ---------------------------------------------------------------
+-- notifications (what each user sees in the bell and the Notifications page)
+-- ---------------------------------------------------------------
+CREATE TABLE notifications (
+  id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id    uuid NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+  actor_id   uuid REFERENCES users (id) ON DELETE SET NULL,
+  type       text NOT NULL
+             CHECK (type IN ('assigned', 'deal_moved', 'activity_logged', 'role_changed')),
+  message    text NOT NULL CHECK (length(trim(message)) > 0),
+  link       text NOT NULL DEFAULT '',
+  read_at    timestamptz,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE INDEX notifications_user_idx ON notifications (user_id, created_at DESC);
+CREATE INDEX notifications_unread_idx ON notifications (user_id) WHERE read_at IS NULL;
