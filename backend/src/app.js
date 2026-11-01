@@ -27,6 +27,11 @@ app.use(helmet());
 app.use(cors({ origin: config.clientOrigin, credentials: true }));
 app.use(express.json({ limit: "1mb" }));
 app.use(cookieParser());
+// API answers are private to each user, so no cache (browser or Vercel's CDN) may keep them
+app.use("/api", (req, res, next) => {
+  res.set("Cache-Control", "no-store");
+  next();
+});
 
 app.get("/api/health", async (req, res) => {
   await query("SELECT 1");

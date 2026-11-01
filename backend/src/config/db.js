@@ -17,7 +17,7 @@ types.setTypeParser(20, (value) => parseInt(value, 10));
 
 export const pool = new Pool({
   connectionString: config.databaseUrl,
-  max: 10,
+  max: config.isProduction ? 5 : 10,
 });
 
 pool.on("error", (error) => {
