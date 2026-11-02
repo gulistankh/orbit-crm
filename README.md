@@ -65,7 +65,7 @@ Browser ──► Vercel (React app) ──/api──► Vercel (Express API) �
 The frontend forwards `/api` requests to the backend, so the browser sees a single site and the login cookie stays first-party.
 
 <p align="center">
-  <img src="docs/screenshots/mobile.png" alt="Orbit CRM on a phone" width="120">
+  <img src="docs/screenshots/mobile.png" alt="Orbit CRM on a phone" width="170">
 </p>
 
 ## Run it locally
