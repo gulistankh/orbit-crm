@@ -2,7 +2,9 @@
 
 A lightweight CRM for small sales teams. It replaces messy spreadsheets with one clean workspace for contacts, companies and deals, with role-based permissions that are enforced on the server.
 
-**Live demo:** https://orbit-crm-gamma-ten.vercel.app/login
+**Live demo:** https://orbit-crm-gamma-ten.vercel.app
+
+**Demo video:** https://youtu.be/A-Dkta40X9Q
 
 Use the demo accounts on the login page. Each has a different role, so you can see how permissions change what each person can do. All demo accounts use the password `demo1234`.
 

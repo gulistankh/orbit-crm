@@ -1,6 +1,10 @@
 # Orbit CRM: case study
 
-**Live demo:** https://orbit-crm-gamma-ten.vercel.app/login · **Code:** https://github.com/gulistankh/orbit-crm
+**Live demo:** https://orbit-crm-gamma-ten.vercel.app · 
+
+**Video:** https://youtu.be/A-Dkta40X9Q ·
+
+ **Code:** https://github.com/gulistankh/orbit-crm
 
 ## The problem
 
