@@ -2,7 +2,7 @@
 
 **Live demo:** https://orbit-crm-gamma-ten.vercel.app · 
 
-**Video:** https://youtu.be/A-Dkta40X9Q ·
+**Video:** https://www.youtube.com/watch?v=QawF8Aodpv4 ·
 
  **Code:** https://github.com/gulistankh/orbit-crm
 

@@ -4,7 +4,7 @@ A lightweight CRM for small sales teams. It replaces messy spreadsheets with one
 
 **Live demo:** https://orbit-crm-gamma-ten.vercel.app
 
-**Demo video:** https://youtu.be/A-Dkta40X9Q
+**Demo video:** https://www.youtube.com/watch?v=QawF8Aodpv4
 
 Use the demo accounts on the login page. Each has a different role, so you can see how permissions change what each person can do. All demo accounts use the password `demo1234`.
 
